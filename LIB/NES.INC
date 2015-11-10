@@ -62,8 +62,8 @@ macro NES_INIT() {
   bit REG_PPUSTATUS // Clear VBL Flag IF Set At Reset
   -
     bit REG_PPUSTATUS
-    bpl - // About 27384 Cycles Have Passed
+    bpl - // ~27384 Cycles Have Passed
   -
     bit REG_PPUSTATUS
-    bpl - // About 57165 Cycles Have Passed
+    bpl - // ~57165 Cycles Have Passed
 }
