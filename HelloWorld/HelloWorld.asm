@@ -64,7 +64,7 @@ seek($8000); Start:
 
   - // Loop Text
     lda HELLOWORLD,x // A = Text Character
-    inx       // X++ (Increment Text Offset)
+    inx   // X++ (Increment Text Offset)
     sta REG_PPUDATA // VRAM Write Data = Text Character ($2007)
     dey   // Y-- (Decrement Text Count)
     bne - // IF (Text Count !=0) Loop Text
