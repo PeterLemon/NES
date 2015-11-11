@@ -87,7 +87,7 @@ Loop:
 HELLOWORLD:
   db "Hello, World!" // Hello World Text
 
-// CHR BANK 0..3 (32KB)
-seek($18000); fill $8000 // Fill CHR Bank 0..3 With Zero Bytes
+// CHR BANK 0 (8KB)
+seek($18000); fill $2000 // Fill CHR Bank 0 With Zero Bytes
 seek($18000)
 include "Font8x8.asm" // Include BG 2BPP 8x8 Tile Font Character Data (2032 Bytes)

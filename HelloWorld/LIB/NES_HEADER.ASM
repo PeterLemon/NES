@@ -19,7 +19,7 @@ db $02
 // $08 = 8 Banks = 128KB, $10 = 16 Banks = 256KB
 
 // CHR-ROM SIZE (Number Of 8KB CHR-ROM Banks)
-db $04
+db $01
 // $01 = 1 Bank  =  8KB, $09 =  9 Banks =  72KB
 // $02 = 2 Banks = 16KB, $0A = 10 Banks =  80KB
 // $03 = 3 Banks = 24KB, $0B = 11 Banks =  88KB
