@@ -59,7 +59,7 @@ LoopSong:
 PeriodTable: // NTSC Period Table Used For APU Note Freqencies
   NTSCPeriodTable() // NTSC Timing, 10 Octaves: C0..B9 (120 Words)
 
-SongStart: // APU Channel 1 Song Data At 250ms (15 NTSC VSYNCS)
+SongStart:
   SONGCHAN1: // APU Channel 1 Song Data At 250ms (15 NTSC VSYNCS)
     db C4, REST, C4, REST, G4, REST, G4, REST, A4, REST, A4, REST, G4, REST, REST, REST // 1. Twinkle Twinkle Little Star...
     db F4, REST, F4, REST, E4, REST, E4, REST, D4, REST, D4, REST, C4, REST, REST, REST // 2.   How I Wonder What You Are...
