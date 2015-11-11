@@ -58,7 +58,7 @@ constant REG_Joy2($4017)      // Read Data From Controller Port #2 / Expansion P
 // $4020..$40FF - Famicom Disk System (FDS)
 // $4100..$FFFF - Various Addresses Used By Cartridge Mappers
 
-macro NES_INIT() {
+macro NES_PPU_INIT() { // PPU Needs Delay From Boot To Work Fully
   bit REG_PPUSTATUS // Clear VBL Flag IF Set At Reset
   -
     bit REG_PPUSTATUS
@@ -66,4 +66,26 @@ macro NES_INIT() {
   -
     bit REG_PPUSTATUS
     bpl - // ~57165 Cycles Have Passed
+}
+
+macro NES_APU_INIT() { // APU Register Setup
+  lda #%00001111  // APU Control: Enable Channel 1..4 (Bit 0..3)
+  sta REG_APUCTRL // Store To APU Control ($4015)
+  ldy #0 // Y Offset = 0
+  - // Loop APU Register Copy
+    lda +,y     // A = Next Byte To Copy
+    sta $4000,y // Store A To APU Register Offset
+    iny     // Y++ (Increment Offset)
+    cpy #24 // Compare Y Offset To 24
+    bne -  // IF (Y Offset != 24) Loop APU Register Copy
+    jmp ++ // ELSE GOTO End
+
+  + // 24 Byte APU Register Copy Data
+    db $30,$08,$00,$00
+    db $30,$08,$00,$00
+    db $80,$00,$00,$00
+    db $30,$00,$00,$00
+    db $00,$00,$00,$00
+    db $00,$0F,$00,$40
+  + // End
 }

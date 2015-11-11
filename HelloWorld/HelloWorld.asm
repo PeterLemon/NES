@@ -18,7 +18,7 @@ include "LIB\NES.INC"        // Include NES Definitions
 include "LIB\NES_VECTOR.ASM" // Include Vector Table
 
 seek($8000); Start:
-  NES_INIT() // Run NES Initialisation Routine
+  NES_PPU_INIT() // Run NES PPU Initialisation Routine
 
   // Write BG Palette 0 (Palette = VRAM $3F00)
   bit REG_PPUSTATUS // Read PPUSTATUS To Reset Address Latch ($2002)
