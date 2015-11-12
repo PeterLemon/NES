@@ -78,12 +78,12 @@ LoopSong:
     lda PeriodTable,y // A = Channel 3: Frequency Hi (Bits 0..3)
     sta REG_APUFREQH3 // Store Channel 3: Frequency Hi ($400B)
 
-    lda #%10111111   // Channel 3: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+    lda #%11000000   // Channel 3: Set Unmute (Bit 6), Linear Counter Start (Bit 7)
     sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
     jmp VSYNCDelay   // GOTO VSYNC Delay
 
     KEYOFF3: // Channel 3: Key OFF
-      lda #%10011111   // Channel 3: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+      lda #%10000000   // Channel 3: Clear Unmute (Bit 6), Linear Counter Start (Bit 7)
       sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
 
 
