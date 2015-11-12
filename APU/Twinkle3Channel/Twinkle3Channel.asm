@@ -58,7 +58,7 @@ LoopSong:
 
     lda #%10111111   // Channel 2: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
     sta REG_APUCTRL2 // Store Channel 2: Control ($4004)
-    jmp APUCHAN3     // GOTO APU Channel 2
+    jmp APUCHAN3     // GOTO APU Channel 3
 
     KEYOFF2: // Channel 2: Key OFF
       lda #%10011111   // Channel 2: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
