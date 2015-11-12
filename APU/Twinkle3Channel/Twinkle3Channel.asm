@@ -34,14 +34,14 @@ LoopSong:
     lda PeriodTable,y // A = Channel 1: Frequency Hi (Bits 0..3)
     sta REG_APUFREQH1 // Store Channel 1: Frequency Hi ($4003)
 
-    lda #%10111111   // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
-    sta REG_APUCTRL1 // Store Channel 1: Control ($4000)
-    jmp APUCHAN2     // GOTO APU Channel 2
+    lda #%10111111  // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+    jmp APUCHAN1End // GOTO APU Channel 1 End
 
     KEYOFF1: // Channel 1: Key OFF
-      lda #%10011111   // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
-      sta REG_APUCTRL1 // Store Channel 1: Control ($4000)
+      lda #%10011111 // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
 
+    APUCHAN1End:
+      sta REG_APUCTRL1 // Store Channel 1: Control ($4000)
 
   APUCHAN2: // APU Channel 2
     ldy SONGCHAN2,x // Y = Channel 2: Period Table Offset
@@ -56,14 +56,14 @@ LoopSong:
     lda PeriodTable,y // A = Channel 2: Frequency Hi (Bits 0..3)
     sta REG_APUFREQH2 // Store Channel 2: Frequency Hi ($4007)
 
-    lda #%10111111   // Channel 2: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
-    sta REG_APUCTRL2 // Store Channel 2: Control ($4004)
-    jmp APUCHAN3     // GOTO APU Channel 3
+    lda #%10111111  // Channel 2: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+    jmp APUCHAN2End // GOTO APU Channel 2 End
 
     KEYOFF2: // Channel 2: Key OFF
-      lda #%10011111   // Channel 2: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
-      sta REG_APUCTRL2 // Store Channel 2: Control ($4004)
+      lda #%10011111 // Channel 2: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
 
+    APUCHAN2End:
+      sta REG_APUCTRL2 // Store Channel 2: Control ($4004)
 
   APUCHAN3: // APU Channel 3
     ldy SONGCHAN3,x // Y = Channel 3: Period Table Offset
@@ -78,14 +78,14 @@ LoopSong:
     lda PeriodTable,y // A = Channel 3: Frequency Hi (Bits 0..3)
     sta REG_APUFREQH3 // Store Channel 3: Frequency Hi ($400B)
 
-    lda #%11000000   // Channel 3: Set Unmute (Bit 6), Linear Counter Start (Bit 7)
-    sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
-    jmp VSYNCDelay   // GOTO VSYNC Delay
+    lda #%11000000  // Channel 3: Set Unmute (Bit 6), Linear Counter Start (Bit 7)
+    jmp APUCHAN3End // GOTO APU Channel 3 End
 
     KEYOFF3: // Channel 3: Key OFF
-      lda #%10000000   // Channel 3: Clear Unmute (Bit 6), Linear Counter Start (Bit 7)
-      sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
+      lda #%10000000 // Channel 3: Clear Unmute (Bit 6), Linear Counter Start (Bit 7)
 
+    APUCHAN3End:
+      sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
 
   VSYNCDelay: // 250 MS Delay (15 NTSC VSYNCS)
     ldy #15 // Y = 15 (VSYNC Count)

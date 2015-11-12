@@ -34,12 +34,13 @@ LoopSong:
     lda PeriodTable,y // A = Channel 1: Frequency Hi (Bits 0..3)
     sta REG_APUFREQH1 // Store Channel 1: Frequency Hi ($4003)
 
-    lda #%10111111   // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
-    sta REG_APUCTRL1 // Store Channel 1: Control ($4000)
-    jmp VSYNCDelay   // GOTO VSYNC Delay
+    lda #%10111111  // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+    jmp APUCHAN1End // GOTO APU Channel 1 End
 
     KEYOFF1: // Channel 1: Key OFF
-      lda #%10011111   // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+      lda #%10011111 // Channel 1: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+
+    APUCHAN1End:
       sta REG_APUCTRL1 // Store Channel 1: Control ($4000)
 
   VSYNCDelay: // 250 MS Delay (15 NTSC VSYNCS)
