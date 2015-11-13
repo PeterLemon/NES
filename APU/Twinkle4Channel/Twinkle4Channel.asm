@@ -70,7 +70,7 @@ LoopSong:
     cpy #REST   // Compare Y T0 REST Character ($FF)
     beq KEYOFF3 // IF (Y == REST) Channel 3: Key OFF
 
-    // ELSE Channel 2: Key ON
+    // ELSE Channel 3: Key ON
     lda PeriodTable,y // A = Channel 3: Frequency Lo
     sta REG_APUFREQL3 // Store Channel 3: Frequency Lo ($400A)
 
@@ -92,6 +92,7 @@ LoopSong:
     cpy #REST   // Compare Y T0 REST Character ($FF)
     beq KEYOFF4 // IF (Y == REST) Channel 4: Key OFF
 
+    // ELSE Channel 4: Key ON
     sty REG_APUFREQL4 // Store Channel 4: Frequency Lo (Noise Rate) ($400E)
     sty REG_APUFREQH4 // Store Channel 4: Frequency Hi (Noise Rate) ($400F)
 
