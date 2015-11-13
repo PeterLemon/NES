@@ -23,7 +23,7 @@ LoopSong:
 
   APUCHAN1: // APU Channel 1
     ldy SONGCHAN1,x // Y = Channel 1: Period Table Offset
-    cpy #REST   // Compare Y T0 REST Character ($FF)
+    cpy #REST   // Compare Y To REST Character ($FF)
     beq KEYOFF1 // IF (Y == REST) Channel 1: Key OFF
 
     // ELSE Channel 1: Key ON
@@ -45,7 +45,7 @@ LoopSong:
 
   APUCHAN2: // APU Channel 2
     ldy SONGCHAN2,x // Y = Channel 2: Period Table Offset
-    cpy #REST   // Compare Y T0 REST Character ($FF)
+    cpy #REST   // Compare Y To REST Character ($FF)
     beq KEYOFF2 // IF (Y == REST) Channel 2: Key OFF
 
     // ELSE Channel 2: Key ON
@@ -67,7 +67,7 @@ LoopSong:
 
   APUCHAN3: // APU Channel 3
     ldy SONGCHAN3,x // Y = Channel 3: Period Table Offset
-    cpy #REST   // Compare Y T0 REST Character ($FF)
+    cpy #REST   // Compare Y To REST Character ($FF)
     beq KEYOFF3 // IF (Y == REST) Channel 3: Key OFF
 
     // ELSE Channel 3: Key ON
@@ -89,7 +89,7 @@ LoopSong:
 
   APUCHAN4: // APU Channel 4
     ldy SONGCHAN4,x // Y = Channel 4: Noise Rate
-    cpy #REST   // Compare Y T0 REST Character ($FF)
+    cpy #REST   // Compare Y To REST Character ($FF)
     beq KEYOFF4 // IF (Y == REST) Channel 4: Key OFF
 
     // ELSE Channel 4: Key ON

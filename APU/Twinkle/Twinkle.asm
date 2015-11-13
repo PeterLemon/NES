@@ -23,7 +23,7 @@ LoopSong:
 
   APUCHAN1: // APU Channel 1
     ldy SONGCHAN1,x // Y = Channel 1: Period Table Offset
-    cpy #REST   // Compare Y T0 REST Character ($FF)
+    cpy #REST   // Compare Y To REST Character ($FF)
     beq KEYOFF1 // IF (Y == REST) Channel 1: Key OFF
 
     // ELSE Channel 1: Key ON
