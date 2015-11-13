@@ -1,0 +1,520 @@
+// NES Italo Disco Test 4 Channel Song Demo by krom (Peter Lemon):
+arch nes.cpu
+output "ItaloTest.nes", create
+
+include "LIB\NES_HEADER.ASM" // Include Header
+
+macro seek(variable offset) {
+  origin (((offset & $7F0000) >> 1) | (offset & $7FFF)) + 16
+  base offset
+}
+
+// PRG BANK 0..1 (32KB)
+seek($8000); fill $8000 // Fill PRG Bank 0..1 With Zero Bytes
+include "LIB\NES.INC"        // Include NES Definitions
+include "LIB\NES_VECTOR.ASM" // Include Vector Table
+include "LIB\NES_APU.INC"    // Include APU Definitions & Macros
+
+// Variable Data
+seek(WRAM) // 2Kb WRAM Mirror ($0000..$07FF)
+SONGCHAN1POS:
+  dw 0 // Song Channel 1 Position Word
+SONGCHAN2POS:
+  dw 0 // Song Channel 2 Position Word
+SONGCHAN3POS:
+  dw 0 // Song Channel 3 Position Word
+SONGCHAN4POS:
+  dw 0 // Song Channel 4 Position Word
+
+seek($8000); Start:
+  NES_APU_INIT() // Run NES APU Initialisation Routine
+
+LoopSong:
+  // Fill WRAM Song Channel Position Word Values
+  lda #SONGCHAN1   // A = Song Channel 1 Start Position Lo Byte
+  sta SONGCHAN1POS // Store Byte To WRAM
+  lda #SONGCHAN1>>8  // A = Song Channel 1 Start Position Hi Byte
+  sta SONGCHAN1POS+1 // Store Byte To WRAM
+
+  lda #SONGCHAN2   // A = Song Channel 2 Start Position Lo Byte
+  sta SONGCHAN2POS // Store Byte To WRAM
+  lda #SONGCHAN2>>8  // A = Song Channel 2 Start Position Hi Byte
+  sta SONGCHAN2POS+1 // Store Byte To WRAM
+
+  lda #SONGCHAN3   // A = Song Channel 3 Start Position Lo Byte
+  sta SONGCHAN3POS // Store Byte To WRAM
+  lda #SONGCHAN3>>8  // A = Song Channel 3 Start Position Hi Byte
+  sta SONGCHAN3POS+1 // Store Byte To WRAM
+
+  lda #SONGCHAN4   // A = Song Channel 4 Start Position Lo Byte
+  sta SONGCHAN4POS // Store Byte To WRAM
+  lda #SONGCHAN4>>8  // A = Song Channel 4 Start Position Hi Byte
+  sta SONGCHAN4POS+1 // Store Byte To WRAM
+
+  ldy #0 // Y = Song Offset
+
+  APUCHAN1: // APU Channel 1
+    lda (SONGCHAN1POS),y // A = Channel 1: Period Table Offset
+    cmp #REST   // Compare A To REST Character ($FF)
+    beq KEYOFF1 // IF (A == REST) Channel 1: Key OFF
+    cmp #SUST       // Compare A To SUST Character ($FE)
+    beq APUCHAN1End // IF (A == SUST) Channel 1: APU Channel 1 End
+
+    // ELSE Channel 1: Key ON
+    tax // X = A
+    lda PeriodTable,x // A = Channel 1: Frequency Lo
+    sta REG_APUFREQL1 // Store Channel 1: Frequency Lo ($4002)
+
+    inx // X++ (Increment Period Table Offset)
+    lda PeriodTable,x // A = Channel 1: Frequency Hi (Bits 0..3)
+    sta REG_APUFREQH1 // Store Channel 1: Frequency Hi ($4003)
+
+    lda #%10110111  // Channel 1: Volume = $7 (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+    jmp APUCHAN1Ctrl // GOTO APU Channel 1 Control
+
+    KEYOFF1: // Channel 1: Key OFF
+      lda #%10010111 // Channel 1: Volume = $7 (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+    APUCHAN1Ctrl:
+      sta REG_APUCTRL1 // Store Channel 1: Control ($4000)
+    APUCHAN1End:
+
+  APUCHAN2: // APU Channel 2
+    lda (SONGCHAN2POS),y // A = Channel 2: Period Table Offset
+    cmp #REST   // Compare A To REST Character ($FF)
+    beq KEYOFF2 // IF (A == REST) Channel 2: Key OFF
+    cmp #SUST       // Compare A To SUST Character ($FE)
+    beq APUCHAN2End // IF (A == SUST) Channel 2: APU Channel 2 End
+
+    // ELSE Channel 2: Key ON
+    tax // X = A
+    lda PeriodTable,x // A = Channel 2: Frequency Lo
+    sta REG_APUFREQL2 // Store Channel 2: Frequency Lo ($4006)
+
+    inx // Y++ (Increment Period Table Offset)
+    lda PeriodTable,x // A = Channel 2: Frequency Hi (Bits 0..3)
+    sta REG_APUFREQH2 // Store Channel 2: Frequency Hi ($4007)
+
+    lda #%00110111   // Channel 2: Volume = $7 (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 12.5% (Bits 6..7)
+    jmp APUCHAN2Ctrl // GOTO APU Channel 2 Control
+
+    KEYOFF2: // Channel 2: Key OFF
+      lda #%00010111 // Channel 2: Volume = $7 (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 12.5% (Bits 6..7)
+    APUCHAN2Ctrl:
+      sta REG_APUCTRL2 // Store Channel 2: Control ($4004)
+    APUCHAN2End:
+
+  APUCHAN3: // APU Channel 3
+    lda (SONGCHAN3POS),y // A = Channel 3: Period Table Offset
+    cmp #REST   // Compare A To REST Character ($FF)
+    beq KEYOFF3 // IF (A == REST) Channel 3: Key OFF
+    cmp #SUST       // Compare A To SUST Character ($FE)
+    beq APUCHAN3End // IF (A == SUST) Channel 3: APU Channel 3 End
+
+    // ELSE Channel 3: Key ON
+    tax // X = A
+    lda PeriodTable,x // A = Channel 3: Frequency Lo
+    sta REG_APUFREQL3 // Store Channel 3: Frequency Lo ($400A)
+
+    inx // X++ (Increment Period Table Offset)
+    lda PeriodTable,x // A = Channel 3: Frequency Hi (Bits 0..3)
+    sta REG_APUFREQH3 // Store Channel 3: Frequency Hi ($400B)
+
+    lda #%11000000   // Channel 3: Set Unmute (Bit 6), Linear Counter Start (Bit 7)
+    jmp APUCHAN3Ctrl // GOTO APU Channel 3 Control
+
+    KEYOFF3: // Channel 3: Key OFF
+      lda #%10000000 // Channel 3: Clear Unmute (Bit 6), Linear Counter Start (Bit 7)
+    APUCHAN3Ctrl:
+      sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
+    APUCHAN3End:
+
+  APUCHAN4: // APU Channel 4
+    lda (SONGCHAN4POS),y // A = Channel 4: Noise Rate
+    cmp #REST   // Compare A To REST Character ($FF)
+    beq KEYOFF4 // IF (A == REST) Channel 4: Key OFF
+    cmp #SUST       // Compare A To SUST Character ($FE)
+    beq APUCHAN4End // IF (A == SUST) Channel 3: APU Channel 4 End
+
+    // ELSE Channel 4: Key ON
+    sta REG_APUFREQL4 // Store Channel 4: Frequency Lo (Noise Rate) ($400E)
+    sta REG_APUFREQH4 // Store Channel 4: Frequency Hi (Noise Rate) ($400F)
+
+    lda #%00100010   // Channel 4: Length = $2 (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5)
+    jmp APUCHAN4Ctrl // GOTO APU Channel 4 Control
+
+    KEYOFF4: // Channel 4: Key OFF
+      lda #%00000010 // Channel 4: Length = $2 (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5)
+    APUCHAN4Ctrl:
+      sta REG_APUCTRL4 // Store Channel 4: Control ($400C)
+    APUCHAN4End:
+
+  // 66 MS Delay (4 NTSC VSYNCS)
+  ldx #4 // X = 4 (VSYNC Count)
+  - // Wait For VBLANK
+    bit REG_PPUSTATUS // Read PPUSTATUS To Reset Address Latch ($2002)
+    bpl - // Wait For VBLANK
+    dex   // X-- (Decrement VSYNC Count)
+    bne - // IF (VSYNC Count != 0) Wait For VBLANK
+    
+  iny // Y++ (Increment Song Offset)
+  beq IncrementSong // IF (Y == 0) GOTO Increment Song
+  jmp APUCHAN1      // ELSE GOTO APU Channel 1
+
+  IncrementSong:
+  // Increment Song Position Hi Bytes (+256)
+  ldx SONGCHAN1POS+1 // X = Song Channel 1 Start Position Hi Byte
+  inx // X++
+  stx SONGCHAN1POS+1 // Store Byte To WRAM
+
+  ldx SONGCHAN2POS+1 // X = Song Channel 2 Start Position Hi Byte
+  inx // X++
+  stx SONGCHAN2POS+1 // Store Byte To WRAM
+
+  ldx SONGCHAN3POS+1 // X = Song Channel 3 Start Position Hi Byte
+  inx // X++
+  stx SONGCHAN3POS+1 // Store Byte To WRAM
+
+  ldx SONGCHAN4POS+1 // X = Song Channel 4 Start Position Hi Byte
+  inx // X++
+  stx SONGCHAN4POS+1 // Store Byte To WRAM
+
+  cpx #SongEnd>>8
+  beq SongReachedEnd
+
+  jmp APUCHAN1 // GOTO APU Channel 1
+
+  SongReachedEnd:
+    jmp LoopSong // GOTO Loop Song
+
+PeriodTable: // NTSC Period Table Used For APU Note Freqencies
+  NTSCPeriodTable() // NTSC Timing, 10 Octaves: C0..B9 (120 Words)
+
+SongStart:
+  SONGCHAN1: // APU Channel 1 Song Data At 250ms (15 NTSC VSYNCS)
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 1.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 2.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 3.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 4.
+
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 5.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 6.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 7.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 8.
+
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 9.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 10.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 11.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 12.
+
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 13.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 14.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 15.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 16.
+
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 17.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 18.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 19.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 20.
+
+    db E2, REST, REST, REST, E3, REST, REST, REST, E2, REST, REST, REST, E3, REST, REST, REST // 21.
+    db E2, REST, REST, REST, E3, REST, REST, REST, E2, REST, REST, REST, E3, REST, REST, REST // 22.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 23.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 24.
+
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 25.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 26.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 27.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 28.
+
+    db E2, REST, REST, REST, E3, REST, REST, REST, E2, REST, REST, REST, E3, REST, REST, REST // 29.
+    db E2, REST, REST, REST, E3, REST, REST, REST, E2, REST, REST, REST, E3, REST, REST, REST // 30.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 31.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 32.
+
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 33.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 34.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 35.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 36.
+
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 37.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 38.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 39.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 40.
+
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 41.
+    db A1, REST, REST, REST, A2, REST, REST, REST, A1, REST, REST, REST, A2, REST, REST, REST // 42.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 43.
+    db C2, REST, REST, REST, C3, REST, REST, REST, C2, REST, REST, REST, C3, REST, REST, REST // 44.
+
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 45.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 46.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 47.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 48.
+
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 49.
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 50.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 51.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 52.
+
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 53.
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 54.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 55.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 56.
+
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 57.
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 58.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 59.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 60.
+
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 61.
+    db F2, REST, REST, REST, F3, REST, REST, REST, F2, REST, REST, REST, F3, REST, REST, REST // 62.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 63.
+    db G2, REST, REST, REST, G3, REST, REST, REST, G2, REST, REST, REST, G3, REST, REST, REST // 64.
+
+  SONGCHAN2: // APU Channel 2 Song Data At 250ms (15 NTSC VSYNCS)
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 1.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 2.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 3.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 4.
+
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 5.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 6.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 7.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 8.
+
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 9.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 10.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 11.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 12.
+
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 13.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 14.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 15.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 16.
+
+    db   A4, SUST, SUST, SUST, REST, REST, REST, REST, E5, SUST, SUST, SUST,   C5, SUST, SUST, SUST // 17.
+    db REST, REST, REST, REST,   A4, SUST, SUST, SUST, E5, SUST, SUST, SUST, REST, REST, REST, REST // 18.
+    db   C5, SUST, SUST, SUST, REST, REST, REST, REST, G5, SUST, SUST, SUST,   E5, SUST, SUST, SUST // 19.
+    db REST, REST, REST, REST,   C5, SUST, SUST, REST, G5, SUST, SUST, SUST, REST, REST, REST, REST // 20.
+
+    db   E5, SUST, SUST, SUST, REST, REST, REST, REST, B5, SUST, SUST, SUST,   G5, SUST, SUST, SUST // 21.
+    db REST, REST, REST, REST,   E5, SUST, SUST, SUST, B5, SUST, SUST, SUST, REST, REST, REST, REST // 22.
+    db   G5, SUST, SUST, SUST, REST, REST, REST, REST, D6, SUST, SUST, SUST,   B5, SUST, SUST, SUST // 23.
+    db REST, REST, REST, REST,   G5, SUST, SUST, SUST, D6, SUST, SUST, SUST, REST, REST, REST, REST // 24.
+
+    db   A4, SUST, SUST, SUST, REST, REST, REST, REST, E5, SUST, SUST, SUST,   C5, SUST, SUST, SUST // 25.
+    db REST, REST, REST, REST,   A4, SUST, SUST, SUST, E5, SUST, SUST, SUST, REST, REST, REST, REST // 26.
+    db   C5, SUST, SUST, SUST, REST, REST, REST, REST, G5, SUST, SUST, SUST,   E5, SUST, SUST, SUST // 27.
+    db REST, REST, REST, REST,   C5, SUST, SUST, REST, G5, SUST, SUST, SUST, REST, REST, REST, REST // 28.
+
+    db   E5, SUST, SUST, SUST, REST, REST, REST, REST, B5, SUST, SUST, SUST,   G5, SUST, SUST, SUST // 29.
+    db REST, REST, REST, REST,   E5, SUST, SUST, SUST, B5, SUST, SUST, SUST, REST, REST, REST, REST // 30.
+    db   G5, SUST, SUST, SUST, REST, REST, REST, REST, D6, SUST, SUST, SUST,   B5, SUST, SUST, SUST // 31.
+    db REST, REST, REST, REST,   G5, SUST, SUST, SUST, D6, SUST, SUST, SUST, REST, REST, REST, REST // 32.
+
+    db   G4, REST, A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST, G4, REST,   C5, REST // 33.
+    db REST, REST, D5, REST, A4, REST, REST, REST, C5, REST, REST, REST, D5, REST, REST, REST // 34.
+    db   G4, REST, A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST, G4, REST,   C5, REST // 35.
+    db REST, REST, D5, REST, A4, REST, REST, REST, C5, REST, REST, REST, D5, REST, REST, REST // 36.
+
+    db   B4, REST,   C5, REST,   D5, REST,   G4, REST, REST, REST, REST, REST, REST, REST, REST, REST // 37.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 38.
+    db   B4, REST,   C5, REST,   D5, REST,   G5, REST, REST, REST, REST, REST, REST, REST, REST, REST // 39.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 40.
+
+    db   G4, REST, A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST, G4, REST,   C5, REST // 41.
+    db REST, REST, D5, REST, A4, REST, REST, REST, C5, REST, REST, REST, D5, REST, REST, REST // 42.
+    db   G4, REST, A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST, G4, REST,   C5, REST // 43.
+    db REST, REST, D5, REST, A4, REST, REST, REST, C5, REST, REST, REST, D5, REST, REST, REST // 44.
+
+    db   B4, REST,   C5, REST,   D5, REST,   G4, REST, REST, REST, REST, REST, REST, REST, REST, REST // 45.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 46.
+    db   B4, REST,   C5, REST,   D5, REST,   G5, REST, REST, REST, REST, REST, REST, REST, REST, REST // 47.
+    db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 48.
+
+    db   F4, REST,   B4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST, REST, REST // 49.
+    db REST, REST, REST, REST, C5, REST, REST, REST, D5, REST,   C5, REST,   D5, REST, REST, REST // 50.
+    db   G4, REST,   A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST,   E5, REST // 51.
+    db REST, REST, REST, REST, G5, REST, REST, REST, A5, REST, REST, REST, REST, REST, REST, REST // 52.
+
+    db   F4, REST,   B4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST, REST, REST // 53.
+    db REST, REST, REST, REST, C5, REST, REST, REST, D5, REST,   C5, REST,   D5, REST, REST, REST // 54.
+    db   G4, REST,   A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST,   E5, REST // 55.
+    db REST, REST, REST, REST, G5, REST, REST, REST, A5, REST, REST, REST, REST, REST, REST, REST // 56.
+
+    db   F4, REST,   B4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST, REST, REST // 57.
+    db REST, REST, REST, REST, C5, REST, REST, REST, D5, REST,   C5, REST,   D5, REST, REST, REST // 58.
+    db   G4, REST,   A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST,   E5, REST // 59.
+    db REST, REST, REST, REST, G5, REST, REST, REST, A5, REST, REST, REST, REST, REST, REST, REST // 60.
+
+    db   F4, REST,   B4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST, REST, REST // 61.
+    db REST, REST, REST, REST, C5, REST, REST, REST, D5, REST,   C5, REST,   D5, REST, REST, REST // 62.
+    db   G4, REST,   A4, REST, C5, REST,   E5, REST, C5, REST,   D5, REST,   A4, REST,   E5, REST // 63.
+    db REST, REST, REST, REST, G5, REST, REST, REST, A5, REST, REST, REST, REST, REST, REST, REST // 64.
+
+  SONGCHAN3: // APU Channel 3 Song Data At 250ms (15 NTSC VSYNCS)
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 1.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 2.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 3.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 4.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 5.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 6.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 7.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 8.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 9.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 10.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 11.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 12.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 13.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 14.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 15.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 16.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 17.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 18.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 19.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 20.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 21.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 22.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 23.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 24.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 25.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 26.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 27.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 28.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 29.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 30.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 31.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 32.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 33.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 34.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 35.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 36.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 37.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 38.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 39.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 40.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 41.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 42.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 43.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 44.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 45.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 46.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 47.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 48.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 49.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 50.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 51.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 52.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 53.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 54.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 55.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 56.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 57.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 58.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 59.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 60.
+
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 61.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 62.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 63.
+    db A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST, A3, REST // 64.
+
+  SONGCHAN4: // APU Channel 4 Song Data At 250ms (15 NTSC VSYNCS)
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 1.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 2.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 3.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 4.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 5.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 6.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 7.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N4, REST, REST, REST, REST, REST, REST, REST // 8.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 9.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 10.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 11.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 12.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 13.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 14.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 15.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 16.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 17.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 18.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 19.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 20.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 21.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 22.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 23.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 24.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 25.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 26.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 27.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 28.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 29.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 30.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 31.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 32.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 33.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 34.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 35.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 36.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 37.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 38.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 39.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 40.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 41.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 42.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 43.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 44.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 45.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 46.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 47.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 48.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 49.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 50.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 51.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 52.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 53.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 54.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 55.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 56.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 57.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 58.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 59.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 60.
+
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 61.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 62.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N6, REST, REST, REST,   N6, REST,   N6, REST // 63.
+    db NE, REST, REST, REST, REST, REST, REST, REST, N2, REST, REST, REST, REST, REST, REST, REST // 64.
+SongEnd:
+
+// CHR BANK 0 (8KB)
+seek($18000); fill $2000 // Fill CHR Bank 0 With Zero Bytes
+seek($18000)

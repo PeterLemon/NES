@@ -132,6 +132,7 @@ constant A9($EA)
 constant A9#($EC)
 constant B9($EE)
 
+constant SUST($FE)
 constant REST($FF)
 
 constant N0($0) // Noise Rate  0: NTSC =    4Hz / PAL =    4Hz
