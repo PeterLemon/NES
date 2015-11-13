@@ -134,6 +134,23 @@ constant B9($EE)
 
 constant REST($FF)
 
+constant N0($0) // Noise Rate  0: NTSC =    4Hz / PAL =    4Hz
+constant N1($1) // Noise Rate  1: NTSC =    8Hz / PAL =    8Hz
+constant N2($2) // Noise Rate  2: NTSC =   16Hz / PAL =   14Hz
+constant N3($3) // Noise Rate  3: NTSC =   32Hz / PAL =   30Hz
+constant N4($4) // Noise Rate  4: NTSC =   64Hz / PAL =   60Hz
+constant N5($5) // Noise Rate  5: NTSC =   96Hz / PAL =   88Hz
+constant N6($6) // Noise Rate  6: NTSC =  128Hz / PAL =  118Hz
+constant N7($7) // Noise Rate  7: NTSC =  160Hz / PAL =  148Hz
+constant N8($8) // Noise Rate  8: NTSC =  202Hz / PAL =  188Hz
+constant N9($9) // Noise Rate  9: NTSC =  254Hz / PAL =  236Hz
+constant NA($A) // Noise Rate 10: NTSC =  380Hz / PAL =  354Hz
+constant NB($B) // Noise Rate 11: NTSC =  508Hz / PAL =  472Hz
+constant NC($C) // Noise Rate 12: NTSC =  762Hz / PAL =  708Hz
+constant ND($D) // Noise Rate 13: NTSC = 1016Hz / PAL =  944Hz
+constant NE($E) // Noise Rate 14: NTSC = 2034Hz / PAL = 1890Hz
+constant NF($F) // Noise Rate 15: NTSC = 4068Hz / PAL = 3778Hz
+
 macro NTSCPeriodTable() { // NTSC Timing, 10 Octaves: C0..B9 (120 Words)
   dw $1AB9,$1939,$17CE,$1678,$1535,$1404,$12E5,$11D5,$10D5,$0FE3,$0EFF,$0E27 // C0..B0
   dw $0D5C,$0C9C,$0BE7,$0B3C,$0A9A,$0A02,$0972,$08EA,$086A,$07F1,$077F,$0713 // C1..B1
