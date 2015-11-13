@@ -96,11 +96,11 @@ LoopSong:
     sty REG_APUFREQL4 // Store Channel 4: Frequency Lo (Noise Rate) ($400E)
     sty REG_APUFREQH4 // Store Channel 4: Frequency Hi (Noise Rate) ($400F)
 
-    lda #%00101111  // Channel 4: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+    lda #%00100011  // Channel 4: Length = $3 (Bits 0..3), Fixed Volume (Bit 4), Enable Looping (Bit 5)
     jmp APUCHAN4End // GOTO APU Channel 4 End
 
     KEYOFF4: // Channel 4: Key OFF
-      lda #%00001111 // Channel 4: Volume = $F (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5), Duty Cycle 50% (Bits 6..7)
+      lda #%00000011 // Channel 4: Length = $3 (Bits 0..3), Fixed Volume (Bit 4), Disable Looping (Bit 5)
 
     APUCHAN4End:
       sta REG_APUCTRL4 // Store Channel 4: Control ($400C)
