@@ -87,13 +87,13 @@ LoopSong:
     APUCHAN3End:
       sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
 
-  VSYNCDelay: // 250 MS Delay (15 NTSC VSYNCS)
-    ldy #15 // Y = 15 (VSYNC Count)
-    - // Wait For VBLANK
-      bit REG_PPUSTATUS // Read PPUSTATUS To Reset Address Latch ($2002)
-      bpl - // Wait For VBLANK
-      dey   // Y-- (Decrement VSYNC Count)
-      bne - // IF (VSYNC Count != 0) Wait For VBLANK
+  // 250 MS Delay (15 NTSC VSYNCS)
+  ldy #15 // Y = 15 (VSYNC Count)
+  - // Wait For VBLANK
+    bit REG_PPUSTATUS // Read PPUSTATUS To Reset Address Latch ($2002)
+    bpl - // Wait For VBLANK
+    dey   // Y-- (Decrement VSYNC Count)
+    bne - // IF (VSYNC Count != 0) Wait For VBLANK
     
   inx // X++ (Increment Song Offset)
   cpx #(SongEnd - SongStart) / 3 // Compare Song Offset To Song Size
