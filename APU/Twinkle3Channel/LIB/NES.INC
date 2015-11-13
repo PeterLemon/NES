@@ -2,7 +2,7 @@
 // NES Include
 //=============
 // Memory Map
-constant WRAM($0000)          // WRAM        ($0000..$0800)                         2KB/RW
+constant WRAM($0000)          // WRAM        ($0000..$07FF)                         2KB/RW
 // $0800..$1FFF - WRAM Mirrored To $0800..$1FFF
 
 // PPU Picture Processing Unit Ports
