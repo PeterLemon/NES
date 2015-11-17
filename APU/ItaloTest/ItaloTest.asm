@@ -162,14 +162,14 @@ LoopSong:
 
   IncrementSong:
     // Increment Song Position Hi Bytes (+256)
-    inc SONGCHAN1POS+1 // Song Channel 1 Start Position Hi Byte++
-    inc SONGCHAN2POS+1 // Song Channel 2 Start Position Hi Byte++
-    inc SONGCHAN3POS+1 // Song Channel 3 Start Position Hi Byte++
-    inc SONGCHAN4POS+1 // Song Channel 4 Start Position Hi Byte++
+    inc SONGCHAN1POS+1 // Song Channel 1 Position Hi Byte++
+    inc SONGCHAN2POS+1 // Song Channel 2 Position Hi Byte++
+    inc SONGCHAN3POS+1 // Song Channel 3 Position Hi Byte++
+    inc SONGCHAN4POS+1 // Song Channel 4 Position Hi Byte++
 
-  lda SONGCHAN4POS+1 // A = Song Channel 4 Start Position Hi Byte
-  cmp #SongEnd>>8    // Compare Song Channel 4 Start Position Hi Byte To Song End Hi Byte
-  beq SongReachedEnd // IF (Song Channel 4 Start Position Hi Byte == Song End Hi Byte) GOTO Song Reached End
+  lda SONGCHAN4POS+1 // A = Song Channel 4 Position Hi Byte
+  cmp #SongEnd>>8    // Compare Song Channel 4 Position Hi Byte To Song End Hi Byte
+  beq SongReachedEnd // IF (Song Channel 4 Position Hi Byte == Song End Hi Byte) GOTO Song Reached End
 
   jmp APUCHAN1 // GOTO APU Channel 1
 
