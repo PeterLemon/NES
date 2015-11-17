@@ -161,25 +161,15 @@ LoopSong:
   jmp APUCHAN1      // ELSE GOTO APU Channel 1
 
   IncrementSong:
-  // Increment Song Position Hi Bytes (+256)
-  ldx SONGCHAN1POS+1 // X = Song Channel 1 Start Position Hi Byte
-  inx // X++
-  stx SONGCHAN1POS+1 // Store Byte To WRAM
+    // Increment Song Position Hi Bytes (+256)
+    inc SONGCHAN1POS+1 // Song Channel 1 Start Position Hi Byte++
+    inc SONGCHAN2POS+1 // Song Channel 2 Start Position Hi Byte++
+    inc SONGCHAN3POS+1 // Song Channel 3 Start Position Hi Byte++
+    inc SONGCHAN4POS+1 // Song Channel 4 Start Position Hi Byte++
 
-  ldx SONGCHAN2POS+1 // X = Song Channel 2 Start Position Hi Byte
-  inx // X++
-  stx SONGCHAN2POS+1 // Store Byte To WRAM
-
-  ldx SONGCHAN3POS+1 // X = Song Channel 3 Start Position Hi Byte
-  inx // X++
-  stx SONGCHAN3POS+1 // Store Byte To WRAM
-
-  ldx SONGCHAN4POS+1 // X = Song Channel 4 Start Position Hi Byte
-  inx // X++
-  stx SONGCHAN4POS+1 // Store Byte To WRAM
-
-  cpx #SongEnd>>8
-  beq SongReachedEnd
+  lda SONGCHAN4POS+1 // A = Song Channel 4 Start Position Hi Byte
+  cmp #SongEnd>>8    // Compare Song Channel 4 Start Position Hi Byte To Song End Hi Byte
+  beq SongReachedEnd // IF (Song Channel 4 Start Position Hi Byte == Song End Hi Byte) GOTO Song Reached End
 
   jmp APUCHAN1 // GOTO APU Channel 1
 
