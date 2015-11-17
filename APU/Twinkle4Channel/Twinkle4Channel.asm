@@ -78,11 +78,11 @@ LoopSong:
     lda PeriodTable,y // A = Channel 3: Frequency Hi (Bits 0..3)
     sta REG_APUFREQH3 // Store Channel 3: Frequency Hi ($400B)
 
-    lda #%11000000  // Channel 3: Set Unmute (Bit 6), Linear Counter Start (Bit 7)
+    lda #%11000000  // Channel 3: Length Count (Bit 0..6), Length Counter Disable (Bit 7)
     jmp APUCHAN3End // GOTO APU Channel 3 End
 
     KEYOFF3: // Channel 3: Key OFF
-      lda #%10000000 // Channel 3: Clear Unmute (Bit 6), Linear Counter Start (Bit 7)
+      lda #%10000000 // Channel 3: Length Count (Bit 0..6), Length Counter Disable (Bit 7)
 
     APUCHAN3End:
       sta REG_APUCTRL3 // Store Channel 3: Control ($4008)
