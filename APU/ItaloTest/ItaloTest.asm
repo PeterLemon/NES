@@ -190,7 +190,7 @@ PeriodTable: // NTSC Period Table Used For APU Note Freqencies
   NTSCPeriodTable() // NTSC Timing, 10 Octaves: C0..B9 (120 Words)
 
 SongStart:
-  SONGCHAN1: // APU Channel 1 Song Data At 250ms (15 NTSC VSYNCS)
+  SONGCHAN1: // APU Channel 1 Song Data At 132ms (8 NTSC VSYNCS)
     db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 1.
     db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 2.
     db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 3.
@@ -231,7 +231,7 @@ SongStart:
     db F2, REST, F3, REST, F2, REST, F3, REST, F2, REST, F3, REST, F2, REST, F3, REST // 31.
     db G2, REST, G3, REST, G2, REST, G3, REST, G2, REST, G3, REST, G2, REST, G3, REST // 32.
 
-  SONGCHAN2: // APU Channel 2 Song Data At 250ms (15 NTSC VSYNCS)
+  SONGCHAN2: // APU Channel 2 Song Data At 132ms (8 NTSC VSYNCS)
     db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 1.
     db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 2.
     db REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST, REST // 3.
@@ -272,7 +272,7 @@ SongStart:
     db F4, B4, C5, E5, C5, D5, A4, REST, REST, REST, C5, REST, D5, C5, D5, REST // 31.
     db G4, A4, C5, E5, C5, D5, A4, E5, REST, REST, G5, REST, A5, REST, REST, REST // 32.
 
-  SONGCHAN3: // APU Channel 3 Song Data At 250ms (15 NTSC VSYNCS)
+  SONGCHAN3: // APU Channel 3 Song Data At 132ms (8 NTSC VSYNCS)
     db A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3 // 1.
     db A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3 // 2.
     db A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3 // 3.
@@ -313,7 +313,7 @@ SongStart:
     db A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3 // 31.
     db A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3, A3 // 32.
 
-  SONGCHAN4: // APU Channel 4 Song Data At 250ms (15 NTSC VSYNCS)
+  SONGCHAN4: // APU Channel 4 Song Data At 132ms (8 NTSC VSYNCS)
     db NE, REST, REST, REST, N4, REST, REST, REST, NE, REST, REST, REST, N4, REST, REST, REST // 1.
     db NE, REST, REST, REST, N4, REST, REST, REST, NE, REST, REST, REST, N4, REST, REST, REST // 2.
     db NE, REST, REST, REST, N4, REST, REST, REST, NE, REST, REST, REST, N4, REST, REST, REST // 3.
