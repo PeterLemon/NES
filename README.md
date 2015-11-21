@@ -23,4 +23,4 @@ Howto Run:<br />
 I only test with a real NES using an Everdrive by krikzz:<br />
 http://krikzz.com<br />
 <br />
-You can also use NES emulators like higan & the MESS NES Driver.
+You can also use NES emulators like higan & the MAME NES Driver.
