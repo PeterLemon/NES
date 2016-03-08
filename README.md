@@ -20,7 +20,6 @@ All the code compiles into a single binary (ROMNAME.nes) file.<br />
 Using bass Run: make.bat<br />
 <br />
 Howto Run:<br />
-I only test with a real NES using an Everdrive by krikzz:<br />
-http://krikzz.com<br />
+I only test with a real NES using a using a flash cartridge.<br />
 <br />
 You can also use NES emulators like higan & the MAME NES Driver.
