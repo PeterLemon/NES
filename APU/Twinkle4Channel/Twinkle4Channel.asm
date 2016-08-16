@@ -2,7 +2,7 @@
 arch nes.cpu
 output "Twinkle4Channel.nes", create
 
-include "LIB\NES_HEADER.ASM" // Include Header
+include "LIB/NES_HEADER.ASM" // Include Header
 
 macro seek(variable offset) {
   origin (((offset & $7F0000) >> 1) | (offset & $7FFF)) + 16
@@ -11,9 +11,9 @@ macro seek(variable offset) {
 
 // PRG BANK 0..1 (32KB)
 seek($8000); fill $8000 // Fill PRG Bank 0..1 With Zero Bytes
-include "LIB\NES.INC"        // Include NES Definitions
-include "LIB\NES_VECTOR.ASM" // Include Vector Table
-include "LIB\NES_APU.INC"    // Include APU Definitions & Macros
+include "LIB/NES.INC"        // Include NES Definitions
+include "LIB/NES_VECTOR.ASM" // Include Vector Table
+include "LIB/NES_APU.INC"    // Include APU Definitions & Macros
 
 seek($8000); Start:
   NES_APU_INIT() // Run NES APU Initialisation Routine

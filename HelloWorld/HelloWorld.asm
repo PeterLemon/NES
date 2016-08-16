@@ -5,7 +5,7 @@
 arch nes.cpu
 output "HelloWorld.nes", create
 
-include "LIB\NES_HEADER.ASM" // Include Header
+include "LIB/NES_HEADER.ASM" // Include Header
 
 macro seek(variable offset) {
   origin (((offset & $7F0000) >> 1) | (offset & $7FFF)) + 16
@@ -14,8 +14,8 @@ macro seek(variable offset) {
 
 // PRG BANK 0..1 (32KB)
 seek($8000); fill $8000 // Fill PRG Bank 0..1 With Zero Bytes
-include "LIB\NES.INC"        // Include NES Definitions
-include "LIB\NES_VECTOR.ASM" // Include Vector Table
+include "LIB/NES.INC"        // Include NES Definitions
+include "LIB/NES_VECTOR.ASM" // Include Vector Table
 
 seek($8000); Start:
   NES_PPU_INIT() // Run NES PPU Initialisation Routine
